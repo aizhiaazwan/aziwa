@@ -10,12 +10,12 @@ import type { Session } from "@supabase/supabase-js";
 
 import { supabase } from "@/lib/supabase";
 
-type AuthContextType = {
+type AuthContextValue = {
   session: Session | null;
   loading: boolean;
 };
 
-const AuthContext = createContext<AuthContextType>({
+const AuthContext = createContext<AuthContextValue>({
   session: null,
   loading: true,
 });
@@ -31,18 +31,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     let mounted = true;
 
-    supabase.auth.getSession().then(({ data }) => {
+    const initializeAuth = async () => {
+      const { data, error } = await supabase.auth.getSession();
+
       if (!mounted) return;
+
+      if (error) {
+        console.error("Gagal mengambil session:", error);
+      }
 
       setSession(data.session);
       setLoading(false);
-    });
+    };
+
+    initializeAuth();
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      setLoading(false);
     });
 
     return () => {

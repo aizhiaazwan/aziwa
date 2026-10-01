@@ -1,23 +1,17 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Redirect } from "expo-router";
 
-export default function HomeScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Aziwa</Text>
-      <Text>Supabase client siap.</Text>
-    </View>
-  );
+import { useAuth } from "@/contexts/AuthContext";
+
+export default function Index() {
+  const { session, loading } = useAuth();
+
+  if (loading) {
+    return null;
+  }
+
+  if (session) {
+    return <Redirect href="/(app)" />;
+  }
+
+  return <Redirect href="/(auth)/login" />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
-});
